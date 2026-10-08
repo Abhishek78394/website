@@ -1,0 +1,28 @@
+# Screenista
+
+> Digital out-of-home platform. Advertisers book connected screens by the second. Screen owners monetize idle airtime.
+
+Screenista Private Limited. Public site: https://screenista.ai
+
+## Products
+
+- Advertiser app: https://app.screenista.ai
+- Partner site: https://partner.screenista.ai
+
+## Pages search engines and assistants should read
+
+- [Home](https://screenista.ai/): product overview
+- [Advertise](https://screenista.ai/advertise): brands and agencies
+- [Screens](https://screenista.ai/screens): media owners
+- [How it works](https://screenista.ai/how-it-works): campaign steps
+- [Pricing](https://screenista.ai/pricing): per-second starting points
+- [Locations](https://screenista.ai/locations): city guides
+- [Industries](https://screenista.ai/industries): category guides
+- [Solutions](https://screenista.ai/solutions): buying, targeting, proof, monetization
+- [Case studies](https://screenista.ai/case-studies)
+- [Blog](https://screenista.ai/blog)
+- [FAQ](https://screenista.ai/faq)
+- [Contact](https://screenista.ai/contact)
+
+Support: support@SCREENiSTA.ai
+Press: press@SCREENiSTA.ai

@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Screenista public site
 
-## Getting Started
-
-First, run the development server:
+Next.js marketing site for [screenista.ai](https://screenista.ai). The advertiser app (`app.screenista.ai`) stays in `screenista-user-next`.
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000. Set `NEXT_PUBLIC_SITE_URL` before a production build so canonical URLs, the sitemap, and Open Graph links use the live domain.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Folder map
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Path | Role |
+| --- | --- |
+| `src/app/(marketing)` | Public, indexable pages. The route group does not appear in the URL. |
+| `src/app/sitemap.ts` | Sitemap generated from the content collections. |
+| `src/app/robots.ts` | Crawler rules plus the sitemap URL. |
+| `src/app/manifest.ts` | Web app manifest. |
+| `src/app/feed.xml/route.ts` | RSS feed for the blog. |
+| `src/app/opengraph-image.tsx` | Default social image. |
+| `src/content` | Typed pages for cities, industries, solutions, cases, and posts. Adding an entry publishes a static URL. |
+| `src/lib/seo` | Titles, canonicals, JSON-LD, and the sitemap list. |
+| `src/components/layout` | Header, footer, breadcrumbs. |
+| `src/components/seo` | JSON-LD script tag. |
+| `public/llms.txt` | Plain-language site map for AI answer engines. |
 
-## Learn More
+## Search setup
 
-To learn more about Next.js, take a look at the following resources:
+- One `h1` per page, semantic `header` / `main` / `nav` / `footer`, and breadcrumb trails.
+- `metadataBase`, title template, description, canonical URL, Open Graph, and Twitter cards.
+- Static generation for known URLs via `generateStaticParams`. Unknown slugs return 404.
+- JSON-LD for the organization, website, breadcrumbs, FAQs, articles, and city/industry services.
+- `sitemap.xml`, `robots.txt`, RSS, a web manifest, and `llms.txt`.
+- `next/font` for Syne and IBM Plex so text does not shift while fonts load.
+- Security headers in `next.config.ts` (`nosniff`, referrer policy, frame policy).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+City, industry, solution, case study, and blog URLs are driven by the files in `src/content`. Add an object there and the page, metadata, and sitemap entry come with it.
