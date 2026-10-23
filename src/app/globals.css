@@ -700,10 +700,80 @@ summary::-webkit-details-marker {
 }
 
 .hero-bg {
+  overflow: hidden;
   background:
     radial-gradient(ellipse 70% 55% at 78% 32%, rgba(255, 90, 54, 0.2), transparent 58%),
     radial-gradient(ellipse 40% 30% at 10% 90%, rgba(255, 255, 255, 0.04), transparent 50%),
     #0c0d10;
+}
+
+/* Line grid revealed in a circle on the pointer, same treatment as the GIS print overlay.
+   Dark strokes multiply onto light sections; an inverted copy screens onto the dark hero. */
+.print {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 40;
+  width: 100%;
+  height: 100lvh;
+  pointer-events: none;
+}
+
+.print .bg,
+.print .static {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.print .ink {
+  mix-blend-mode: multiply;
+}
+
+.print .glow {
+  mix-blend-mode: screen;
+  filter: invert(1) brightness(1.45);
+}
+
+.print .static.ink {
+  opacity: 0.05;
+}
+
+.print .static.glow {
+  opacity: 0.05;
+}
+
+.print .bg.ink,
+.print .bg.glow {
+  opacity: 0.5;
+  mask-image: radial-gradient(circle at 0 0, #fff 0, transparent 20%);
+}
+
+.print .bg.ink {
+  filter: brightness(1.35) contrast(1.05);
+}
+
+@media (max-width: 580px) {
+  .print .static.ink {
+    opacity: 0.12;
+  }
+
+  .print .static.glow {
+    opacity: 0.1;
+  }
+
+  .print .bg {
+    mask-image: radial-gradient(circle at 50% 50%, #fff 0, transparent 40%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .print .bg {
+    display: none;
+  }
 }
 
 /* ---------- Pricing stage + closing card ---------- */

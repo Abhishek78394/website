@@ -38,7 +38,7 @@ export function Hero() {
   return (
     <section ref={root} className="hero-bg relative -mt-14 text-white">
       <div className="hero-pin flex min-h-svh flex-col justify-center pt-(--nav-h) pb-12">
-        <div className="hero-copy mx-auto w-full max-w-[1400px] px-5 text-center">
+        <div className="mx-auto w-full max-w-[1400px] px-5 text-center">
           <p className="font-mono text-[11px] tracking-[0.18em] text-white/45 uppercase">Intelligent Out of Home</p>
           <h1 className="hero-title mx-auto mt-4 text-white">
             {lines.map((line) => (

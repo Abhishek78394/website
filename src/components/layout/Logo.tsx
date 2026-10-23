@@ -9,10 +9,10 @@ export function Logo({ tone = "dark", nav = false }: { tone?: "dark" | "light"; 
       <Image
         src={onDark ? "/brand/logo-light.png" : "/brand/logo-dark.png"}
         alt=""
-        width={800}
-        height={160}
+        width={972}
+        height={306}
         priority={nav}
-        className={nav ? "h-9 w-auto" : "h-11 w-auto"}
+        className={nav ? "h-10 w-auto" : "h-12 w-auto"}
       />
     </Link>
   );

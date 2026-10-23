@@ -10,7 +10,14 @@ import { Magnetic } from "@/components/home/Magnetic";
 const RATE_PAISE = 30;
 const MAX_SECONDS = 120;
 const DEFAULT_SECONDS = 30;
+const DEFAULT_SCREENS = 4;
+const MAX_SCREENS = 20;
+const DEFAULT_PLAYS = 10;
+const MAX_PLAYS = 200;
+const VIEWERS_PER_PLAY = 20;
 const presets = [10, 30, 60, 120] as const;
+const screenPresets = [1, 2, 4, 8] as const;
+const playPresets = [1, 5, 10, 20] as const;
 
 const steps = [
   { n: "01", label: "Choose location" },
@@ -24,8 +31,48 @@ const steps = [
 const ARC_R = 160;
 const ARC_LEN = 2 * Math.PI * ARC_R;
 
-function rupees(seconds: number) {
-  return (seconds * RATE_PAISE) / 100;
+function rupees(seconds: number, screens: number, plays: number) {
+  return (seconds * screens * plays * RATE_PAISE) / 100;
+}
+
+function impressions(screens: number, plays: number) {
+  return screens * plays * VIEWERS_PER_PLAY;
+}
+
+function quoteRef(seconds: number, screens: number, plays: number) {
+  const day = new Date().toISOString().slice(0, 10).replaceAll("-", "");
+  return `SQ-${day}-${seconds}-${screens}-${plays}`;
+}
+
+function quotationMessage(seconds: number, screens: number, plays: number) {
+  const budget = formatRupees(rupees(seconds, screens, plays));
+  const reach = impressions(screens, plays).toLocaleString("en-IN");
+  const date = new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", year: "numeric" }).format(new Date());
+  return [
+    "*SCREENISTA QUOTATION*",
+    `Ref: ${quoteRef(seconds, screens, plays)}`,
+    `Date: ${date}`,
+    "",
+    "From",
+    siteConfig.legalName,
+    siteConfig.email,
+    "",
+    "*Campaign*",
+    `Ad length: ${seconds} seconds`,
+    `Screens: ${screens}`,
+    `Plays per screen: ${plays}`,
+    "Rate: ₹0.30 per second",
+    "",
+    "*Amount*",
+    `${seconds} sec × ${screens} screens × ${plays} plays × ₹0.30`,
+    `*Total: ${budget}*`,
+    "",
+    "*Outcome for the client*",
+    `Estimated impressions: ${reach}`,
+    `About ${VIEWERS_PER_PLAY} people could see each play. This is a planning estimate, not a verified play log.`,
+    "",
+    "Cities: Bhopal, Indore, Jaipur, Goa, Hisar",
+  ].join("\n");
 }
 
 function formatRupees(value: number) {
@@ -43,8 +90,12 @@ export function Pricing() {
   const root = useRef<HTMLElement>(null);
   const priceRef = useRef<HTMLSpanElement>(null);
   const gsapRef = useRef<typeof import("gsap").default | null>(null);
-  const shown = useRef({ value: rupees(DEFAULT_SECONDS) });
+  const shown = useRef({ value: rupees(DEFAULT_SECONDS, DEFAULT_SCREENS, DEFAULT_PLAYS) });
   const [seconds, setSeconds] = useState<number>(DEFAULT_SECONDS);
+  const [screens, setScreens] = useState<number>(DEFAULT_SCREENS);
+  const [plays, setPlays] = useState<number>(DEFAULT_PLAYS);
+  const [quoteOpen, setQuoteOpen] = useState(false);
+  const quoteRefEl = useRef<HTMLElement>(null);
 
   // Scroll choreography
   useEffect(() => {
@@ -150,7 +201,7 @@ export function Pricing() {
   useEffect(() => {
     const el = priceRef.current;
     if (!el) return;
-    const target = rupees(seconds);
+    const target = rupees(seconds, screens, plays);
     const gsap = gsapRef.current;
     if (!gsap || prefersReducedMotion()) {
       shown.current.value = target;
@@ -170,9 +221,17 @@ export function Pricing() {
     return () => {
       tween.kill();
     };
-  }, [seconds]);
+  }, [seconds, screens, plays]);
 
   const progress = (seconds / MAX_SECONDS) * 100;
+  const budget = rupees(seconds, screens, plays);
+  const reach = impressions(screens, plays);
+  const showQuote = () => {
+    setQuoteOpen(true);
+    window.setTimeout(() => {
+      quoteRefEl.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 40);
+  };
 
   return (
     <section ref={root} id="pricing" className="rate" aria-labelledby="pricing-heading">
@@ -236,7 +295,7 @@ export function Pricing() {
 
             <div className="rate-note rate-note-d">
               <span className="size-1.5 rounded-full bg-accent" />
-              Mumbai · Delhi NCR · Bengaluru
+              Bhopal · Indore · Jaipur · Goa · Hisar
             </div>
           </div>
         </div>
@@ -276,16 +335,102 @@ export function Pricing() {
               </span>
             </label>
 
-            <p className="mt-8 border-t border-line pt-6 text-sm leading-6 text-muted">
-              {seconds} seconds × ₹0.30 per second. Campaigns can start from ₹500.
+            <div className="mt-8">
+              <p className="font-mono text-[11px] tracking-[0.16em] text-muted uppercase">How many screens</p>
+              <div className="rate-chips mt-3" role="group" aria-label="Number of screens">
+                {screenPresets.map((preset) => (
+                  <button key={preset} type="button" aria-pressed={screens === preset} onClick={() => setScreens(preset)}>
+                    {preset}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-3 flex items-center justify-between">
+                <button
+                  type="button"
+                  className="grid size-9 place-items-center rounded-full border border-ink/15 text-lg text-ink hover:border-ink/40"
+                  onClick={() => setScreens((value) => Math.max(1, value - 1))}
+                  aria-label="Fewer screens"
+                >
+                  −
+                </button>
+                <p className="font-mono text-sm text-ink">
+                  {screens} {screens === 1 ? "screen" : "screens"}
+                </p>
+                <button
+                  type="button"
+                  className="grid size-9 place-items-center rounded-full border border-ink/15 text-lg text-ink hover:border-ink/40"
+                  onClick={() => setScreens((value) => Math.min(MAX_SCREENS, value + 1))}
+                  aria-label="More screens"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-8">
+              <p className="font-mono text-[11px] tracking-[0.16em] text-muted uppercase">Plays per screen</p>
+              <div className="rate-chips mt-3" role="group" aria-label="Plays per screen">
+                {playPresets.map((preset) => (
+                  <button key={preset} type="button" aria-pressed={plays === preset} onClick={() => setPlays(preset)}>
+                    {preset}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-3 flex items-center justify-between">
+                <button
+                  type="button"
+                  className="grid size-9 place-items-center rounded-full border border-ink/15 text-lg text-ink hover:border-ink/40"
+                  onClick={() => setPlays((value) => Math.max(1, value - 1))}
+                  aria-label="Fewer plays"
+                >
+                  −
+                </button>
+                <p className="font-mono text-sm text-ink">
+                  {plays} {plays === 1 ? "play" : "plays"} each
+                </p>
+                <button
+                  type="button"
+                  className="grid size-9 place-items-center rounded-full border border-ink/15 text-lg text-ink hover:border-ink/40"
+                  onClick={() => setPlays((value) => Math.min(MAX_PLAYS, value + 1))}
+                  aria-label="More plays"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-8 grid grid-cols-2 gap-3 border-t border-line pt-6">
+              <div>
+                <p className="font-mono text-[10px] tracking-[0.16em] text-muted uppercase">Budget</p>
+                <p className="mt-1 text-2xl font-semibold tracking-tight text-ink">
+                  {formatRupees(rupees(seconds, screens, plays))}
+                </p>
+              </div>
+              <div>
+                <p className="font-mono text-[10px] tracking-[0.16em] text-muted uppercase">Impressions</p>
+                <p className="mt-1 text-2xl font-semibold tracking-tight text-ink">
+                  {impressions(screens, plays).toLocaleString("en-IN")}
+                </p>
+              </div>
+            </div>
+            <p className="mt-3 text-sm leading-6 text-muted">
+              {seconds} seconds × {screens} {screens === 1 ? "screen" : "screens"} × {plays}{" "}
+              {plays === 1 ? "play" : "plays"} × ₹0.30 per second. About {VIEWERS_PER_PLAY} people could see each play — a
+              planning estimate, not a verified play log.
             </p>
 
-            <div className="mt-7">
-              <Magnetic>
-                <Button href={siteConfig.appUrl} external className="w-full justify-center sm:w-auto">
-                  Start Advertising
-                </Button>
-              </Magnetic>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <button
+                type="button"
+                onClick={showQuote}
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-medium text-white transition hover:bg-[#2a2d33]"
+              >
+                Show quotation
+                <span aria-hidden="true">→</span>
+              </button>
+              <Button href={siteConfig.appUrl} external variant="secondary" className="w-full justify-center sm:w-auto">
+                Start Advertising
+              </Button>
             </div>
           </div>
 
@@ -330,17 +475,115 @@ export function Pricing() {
               <div className="rate-face">
                 <p className="font-mono text-[10px] tracking-[0.2em] text-muted uppercase">You pay</p>
                 <p className="rate-price" aria-hidden="true">
-                  <span ref={priceRef}>{formatRupees(rupees(DEFAULT_SECONDS))}</span>
+                  <span ref={priceRef}>{formatRupees(rupees(DEFAULT_SECONDS, DEFAULT_SCREENS, DEFAULT_PLAYS))}</span>
                 </p>
                 <p className="sr-only" aria-live="polite">
-                  {formatRupees(rupees(seconds))} for {seconds} seconds
+                  {formatRupees(rupees(seconds, screens, plays))} for {seconds} seconds, {plays} plays, on {screens}{" "}
+                  screens. Estimated impressions {impressions(screens, plays)}.
                 </p>
-                <p className="mt-2 text-sm text-muted">for {seconds} seconds</p>
+                <p className="mt-2 text-sm text-muted">
+                  {plays} {plays === 1 ? "play" : "plays"} on {screens} {screens === 1 ? "screen" : "screens"}
+                </p>
               </div>
             </div>
             <p className="rate-chip-float">Live price follows the screen and the hour</p>
           </div>
         </div>
+
+        {quoteOpen ? (
+          <article
+            ref={quoteRefEl}
+            id="quotation"
+            aria-labelledby="quotation-heading"
+            className="mt-12 scroll-mt-24 rounded-[2rem] border border-white/90 bg-white px-6 py-8 shadow-[0_30px_70px_-34px_rgba(16,17,20,0.28)] md:px-10 md:py-10"
+          >
+            <div className="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-6">
+              <div>
+                <p className="font-mono text-[11px] tracking-[0.18em] text-muted uppercase">Quotation</p>
+                <h3 id="quotation-heading" className="mt-2 font-display text-4xl tracking-tight text-ink">
+                  Screenista
+                </h3>
+                <p className="mt-2 text-sm text-muted">{siteConfig.legalName}</p>
+                <p className="text-sm text-muted">{siteConfig.email}</p>
+              </div>
+              <div className="text-sm leading-6 text-ink">
+                <p>
+                  <span className="text-muted">Ref </span>
+                  {quoteRef(seconds, screens, plays)}
+                </p>
+                <p>
+                  <span className="text-muted">Date </span>
+                  {new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", year: "numeric" }).format(new Date())}
+                </p>
+                <p>
+                  <span className="text-muted">Cities </span>
+                  Bhopal, Indore, Jaipur, Goa, Hisar
+                </p>
+              </div>
+            </div>
+
+            <table className="mt-6 w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-line text-[11px] tracking-[0.14em] text-muted uppercase">
+                  <th className="py-3 font-medium">Item</th>
+                  <th className="py-3 text-right font-medium">Detail</th>
+                </tr>
+              </thead>
+              <tbody className="text-ink">
+                <tr className="border-b border-line/80">
+                  <td className="py-3">Ad length</td>
+                  <td className="py-3 text-right">{seconds} seconds</td>
+                </tr>
+                <tr className="border-b border-line/80">
+                  <td className="py-3">Screens</td>
+                  <td className="py-3 text-right">{screens}</td>
+                </tr>
+                <tr className="border-b border-line/80">
+                  <td className="py-3">Plays per screen</td>
+                  <td className="py-3 text-right">{plays}</td>
+                </tr>
+                <tr className="border-b border-line/80">
+                  <td className="py-3">Rate</td>
+                  <td className="py-3 text-right">₹0.30 per second</td>
+                </tr>
+                <tr>
+                  <td className="py-3 text-muted">
+                    {seconds} sec × {screens} screens × {plays} plays
+                  </td>
+                  <td className="py-3 text-right font-semibold">{formatRupees(budget)}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl bg-paper px-5 py-4">
+                <p className="font-mono text-[10px] tracking-[0.16em] text-muted uppercase">Total</p>
+                <p className="mt-1 text-3xl font-semibold tracking-tight text-ink">{formatRupees(budget)}</p>
+              </div>
+              <div className="rounded-2xl bg-paper px-5 py-4">
+                <p className="font-mono text-[10px] tracking-[0.16em] text-muted uppercase">Outcome</p>
+                <p className="mt-1 text-3xl font-semibold tracking-tight text-ink">{reach.toLocaleString("en-IN")}</p>
+                <p className="mt-1 text-sm text-muted">Estimated impressions</p>
+              </div>
+            </div>
+            <p className="mt-4 text-sm leading-6 text-muted">
+              About {VIEWERS_PER_PLAY} people could see each play. This is a planning estimate, not a verified play log.
+              The live price follows the screen and the hour.
+            </p>
+
+            <div className="mt-7">
+              <Magnetic>
+                <Button
+                  href={`https://wa.me/?text=${encodeURIComponent(quotationMessage(seconds, screens, plays))}`}
+                  external
+                  className="w-full justify-center sm:w-auto"
+                >
+                  Send this quotation on WhatsApp
+                </Button>
+              </Magnetic>
+            </div>
+          </article>
+        ) : null}
 
         <ol className="rate-steps">
           <li className="rate-steps-line" aria-hidden="true">

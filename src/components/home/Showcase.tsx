@@ -6,60 +6,95 @@ import { SectionHeading } from "@/components/home/SectionHeading";
 
 type Slide = {
   venue: string;
-  headline: string;
-  spot: string;
+  places: string;
   note: string;
+  spot: string;
   bg: string;
   ink: string;
   beam: string;
 };
 
-// Illustrative creatives only: no brands, no performance claims.
 const slides: readonly Slide[] = [
   {
-    venue: "Mall",
-    headline: "Weekend",
+    venue: "Beauty & Grooming",
+    places: "Screens placed in beauty and grooming venues.",
+    note: "A screen in a beauty or grooming venue plays while people are already there for an appointment.",
     spot: "15 sec",
-    note: "Atrium and concourse screens, where people slow down.",
     bg: "linear-gradient(135deg, #0f1519 0%, #1b2830 100%)",
     ink: "#cfe6f5",
     beam: "rgba(160, 205, 235, 0.22)",
   },
   {
-    venue: "Street",
-    headline: "Now open",
-    spot: "10 sec",
-    note: "Roadside and high-street screens with a long line of sight.",
+    venue: "Educational",
+    places: "Screens placed in educational venues.",
+    note: "Educational venues cover campuses and coaching centres, where the same screen can change by the hour.",
+    spot: "15 sec",
     bg: "linear-gradient(135deg, #efe9dd 0%, #d9d0bf 100%)",
     ink: "#16130f",
     beam: "rgba(255, 255, 255, 0.55)",
   },
   {
-    venue: "Transit",
-    headline: "Next stop",
-    spot: "30 sec",
-    note: "Stations and routes, reaching people on the move.",
+    venue: "Fashion",
+    places: "Screens placed in fashion venues.",
+    note: "Fashion venues put the screen inside the store, next to the clothes people are already looking at.",
+    spot: "10 sec",
     bg: "linear-gradient(135deg, #1a1030 0%, #3a1f63 100%)",
     ink: "#f1e6ff",
     beam: "rgba(190, 150, 255, 0.28)",
   },
   {
-    venue: "Store",
-    headline: "New in",
+    venue: "Fitness",
+    places: "Screens placed in fitness venues.",
+    note: "Fitness venues are gyms and studios. The screen runs while people train.",
     spot: "10 sec",
-    note: "In-store screens, close to the moment of choice.",
     bg: "linear-gradient(135deg, #e6efe1 0%, #c9dcc2 100%)",
     ink: "#10261a",
     beam: "rgba(255, 255, 255, 0.55)",
   },
   {
-    venue: "Office",
-    headline: "Lunch",
+    venue: "Health",
+    places: "Screens placed in health venues.",
+    note: "Health venues are clinics and care centres. The screen reaches people in the waiting time.",
     spot: "15 sec",
-    note: "Lobbies and corridors, reaching people on the way through the day.",
     bg: "linear-gradient(135deg, #0c1a30 0%, #16345c 100%)",
     ink: "#dbeafe",
     beam: "rgba(130, 180, 255, 0.25)",
+  },
+  {
+    venue: "Hospitality",
+    places: "Hotel, restaurant, cafe, bar, resort, club, pub.",
+    note: "Hospitality screens sit in hotels, restaurants, cafes, bars, resorts, clubs, pubs and ice cream parlors.",
+    spot: "15 sec",
+    bg: "linear-gradient(160deg, #2a1548 0%, #6b2fd1 100%)",
+    ink: "#f6e9ff",
+    beam: "rgba(220, 180, 255, 0.28)",
+  },
+  {
+    venue: "Realty Residential",
+    places: "Apartment, open society, independent house, society.",
+    note: "Residential realty screens are placed in apartments, open societies, independent houses and societies.",
+    spot: "15 sec",
+    bg: "linear-gradient(135deg, #f4efe6 0%, #e4d3bc 100%)",
+    ink: "#1c140c",
+    beam: "rgba(255, 255, 255, 0.55)",
+  },
+  {
+    venue: "Realty Commercial",
+    places: "Screens placed in commercial realty venues.",
+    note: "Commercial realty screens sit in business properties, where people pass through the working day.",
+    spot: "10 sec",
+    bg: "linear-gradient(135deg, #14202b 0%, #243848 100%)",
+    ink: "#d7e7f2",
+    beam: "rgba(160, 200, 230, 0.22)",
+  },
+  {
+    venue: "Retail",
+    places: "Mall, supermarket, store, electronics, furniture.",
+    note: "Retail screens are placed in malls, supermarkets, stores, electronics, furniture and automotive shops.",
+    spot: "10 sec",
+    bg: "linear-gradient(135deg, #101614 0%, #1d3a2e 100%)",
+    ink: "#e5f6ea",
+    beam: "rgba(170, 230, 190, 0.22)",
   },
 ];
 
@@ -84,22 +119,13 @@ function Card({ slide, active }: { slide: Slide; active: boolean }) {
             <span className="h-[2.8cqw] w-[2.8cqw] rounded-full bg-current" />
             <span className="h-[2.8cqw] w-[2.8cqw] rounded-full border border-current" />
           </span>
-          <span className="flex gap-[4cqw] opacity-80">
-            {slides.map((s) => (
-              <span key={s.venue} className={s.venue === slide.venue ? "opacity-100" : "opacity-60"}>
-                {s.venue}
-              </span>
-            ))}
-          </span>
+          <span className="uppercase tracking-[0.14em] opacity-70">Venue</span>
         </div>
 
-        <div className="flex items-end gap-[2cqw]">
-          <p className="text-[18cqw] leading-[0.82] font-semibold tracking-[-0.065em] pb-[1.2cqw]">{slide.headline}</p>
-          <p className="pb-[2.4cqw] text-[3cqw] tracking-[0.02em] uppercase opacity-80">({slide.venue})</p>
-        </div>
+        <p className="max-w-[96%] text-[8cqw] leading-[0.92] font-semibold tracking-[-0.045em]">{slide.venue}</p>
 
         <div className="flex items-end justify-between gap-[4cqw] text-[2.9cqw] leading-[1.3]">
-          <p className="max-w-[44%] opacity-80">Illustrative creative, {slide.venue.toLowerCase()} screen.</p>
+          <p className="max-w-[62%] opacity-80">{slide.places}</p>
           <p className="text-right opacity-80">
             {slide.spot} spot
             <br />
@@ -146,9 +172,9 @@ export function Showcase() {
       <Container>
         <SectionHeading
           id="showcase-heading"
-          eyebrow="Where ads appear"
-          title="Screens in places people already go."
-          body="Malls, streets, offices, transit and stores. Pick the venue, set the hours."
+          eyebrow="Where screens are placed"
+          title="The type of place a screen sits in."
+          body="Beauty and grooming, educational, fashion, fitness, health, hospitality, residential realty, commercial realty and retail."
         />
       </Container>
 
